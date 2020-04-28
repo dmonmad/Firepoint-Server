@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +7,11 @@ public class NetworkManager : MonoBehaviour
 {
     public static NetworkManager instance;
 
+    public GameObject[] weaponPrefabs;
+
     public GameObject playerPrefab;
+
+    //public Transform[] spawners;
 
     private void Awake()
     {
@@ -19,6 +24,10 @@ public class NetworkManager : MonoBehaviour
             Debug.Log("Instance already exists, destroying object!");
             Destroy(this);
         }
+
+        PopulateDictionaryWithWeapons();
+
+        MapManager.Initialize(this);
     }
 
     private void Start()
@@ -26,15 +35,30 @@ public class NetworkManager : MonoBehaviour
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 30;
 
-        #if UNITY_EDITOR
-        Debug.Log("Build the project to start the server!");
-        #else
         Server.Start(50, 26950);
-        #endif
+    }
+
+    private void OnApplicationQuit()
+    {
+        Server.Stop();
     }
 
     public Player InstantiatePlayer()
     {
-        return Instantiate(playerPrefab, Vector3.zero, Quaternion.identity).GetComponent<Player>();
+        return Instantiate(playerPrefab, MapManager.GetRandomSpawner(), Quaternion.identity).GetComponent<Player>();
+    }
+
+    public GameObject GetWeapon(int _id)
+    {
+        return Weapon.weapons[_id];
+    }
+
+    private void PopulateDictionaryWithWeapons()
+    {
+
+        foreach (GameObject weapon in weaponPrefabs)
+        {
+            Weapon.weapons.Add((int)weapon.GetComponent<Weapon>().weaponName, weapon);
+        }
     }
 }

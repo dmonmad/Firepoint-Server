@@ -219,18 +219,28 @@ public class Client
                 ServerSend.SpawnPlayer(_client.id, player);
             }
         }
+
+        foreach(Weapon _item in Weapon.items.Values)
+        {
+            ServerSend.CreateItemSpawner(id, (int)_item.weaponName, _item.itemId, _item.transform.position);
+        }
     }
 
     private void Disconnect()
     {
         Debug.Log($"{tcp.socket.Client.RemoteEndPoint} has disconnected.");
 
-        UnityEngine.Object.Destroy(player.gameObject);
+        ThreadManager.ExecuteOnMainThread(() =>
+        {
+            UnityEngine.Object.Destroy(player.gameObject);
 
-        player = null;
-
+            player = null;
+        });
+        
         tcp.Disconnect();
         udp.Disconnect();
+
+        ServerSend.PlayerDisconnect(id);
     }
 
 }

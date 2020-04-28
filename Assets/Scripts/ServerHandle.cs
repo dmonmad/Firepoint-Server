@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,4 +29,29 @@ public class ServerHandle
 
         Server.clients[_fromClient].player.SetInput(_inputs, _rotation);
     }
+
+    public static void PlayerShoot(int _fromClient, Packet _packet)
+    {
+        Vector3 _shootDirection = _packet.ReadVector3();
+
+        Server.clients[_fromClient].player.Shoot(_shootDirection);
+
+    }
+
+    public static void PlayerBuy(int _fromClient, Packet _packet)
+    {
+        Vector3 _shootDirection = _packet.ReadVector3();
+
+        Server.clients[_fromClient].player.Shoot(_shootDirection);
+    }
+
+    public static void PlayerDropWeapon(int _fromClient, Packet _packet)
+    {
+        Debug.Log("Receiving PlayerDropWeapon");
+        Vector3 _dropDirection = _packet.ReadVector3();
+
+        Server.clients[_fromClient].player.DropWeapon(_dropDirection);
+    }
+
+
 }

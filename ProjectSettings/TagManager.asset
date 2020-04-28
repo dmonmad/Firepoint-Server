@@ -3,7 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Wall
+  - Ground
+  - Weapon
+  - WeaponGFX
+  - Spawner
+  - WeaponSpawner
+  - PlayerSpawner
   layers:
   - Default
   - TransparentFX
@@ -13,10 +20,10 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
+  - Map
+  - Player
+  - Weapon
+  - WeaponGFX
   - 
   - 
   - 

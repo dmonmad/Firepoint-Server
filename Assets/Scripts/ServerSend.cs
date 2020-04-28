@@ -32,6 +32,7 @@ public class ServerSend
             Server.clients[i].tcp.SendData(_packet);
         }
     }
+
     /// <summary>Sends a packet to all clients except one via TCP.</summary>
     /// <param name="_exceptClient">The client to NOT send the data to.</param>
     /// <param name="_packet">The packet to send.</param>
@@ -57,6 +58,7 @@ public class ServerSend
             Server.clients[i].udp.SendData(_packet);
         }
     }
+
     /// <summary>Sends a packet to all clients except one via UDP.</summary>
     /// <param name="_exceptClient">The client to NOT send the data to.</param>
     /// <param name="_packet">The packet to send.</param>
@@ -111,6 +113,7 @@ public class ServerSend
         {
             _packet.Write(_player.id);
             _packet.Write(_player.transform.position);
+            _packet.Write(Time.deltaTime);
 
             SendUDPDataToAll(_packet);
         }
@@ -128,5 +131,100 @@ public class ServerSend
             SendUDPDataToAll(_player.id, _packet);
         }
     }
+
+    /// <summary>Sends a player's disconnection to all clients except to himself (since he's already disconnected).</summary>
+    /// <param name="_playerId">The player id that disconnected.</param>
+    public static void PlayerDisconnect(int _playerId)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.playerDisconnected))
+        {
+            _packet.Write(_playerId);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    /// <summary>Sends a player's updated health to all clients.</summary>
+    /// <param name="_player">The player whose health to update.</param>
+    public static void PlayerHealth(Player _player)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.playerHealth))
+        {
+            _packet.Write(_player.id);
+            _packet.Write(_player.health);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    /// <summary>Sends a player's updated rotation to all clients except to himself (to avoid overwriting the local player's rotation).</summary>
+    /// <param name="_player">The player whose rotation to update.</param>
+    public static void PlayerRespawned(Player _player)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.playerRespawned))
+        {
+            _packet.Write(_player.id);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    /// <summary>Sends a player's updated rotation to all clients except to himself (to avoid overwriting the local player's rotation).</summary>
+    /// <param name="_player">The player whose rotation to update.</param>
+    public static void ApplyDecal(Vector3 _hitPosition, Quaternion _hitRotation)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.applyDecal))
+        {
+            _packet.Write(_hitPosition);
+            _packet.Write(_hitRotation);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    public static void CreateItemSpawner(int _toClient, int _weaponId, int _itemId, Vector3 _itemPosition)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.createItemSpawner))
+        {
+            _packet.Write(_weaponId);
+            _packet.Write(_itemId);
+            _packet.Write(_itemPosition);
+
+            SendTCPData(_toClient, _packet);
+        }
+    }
+
+    public static void ItemSpawned(int _spawnerId)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.itemSpawned))
+        {
+            _packet.Write(_spawnerId);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    public static void ItemPickedUp(int _itemId, int _byPlayer)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.itemPickedUp))
+        {
+            _packet.Write(_itemId);
+            _packet.Write(_byPlayer);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    public static void PlayerThrowWeapon(Vector3 _facing, int _byPlayer)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.itemThrown))
+        {
+            _packet.Write(_facing);
+            _packet.Write(_byPlayer);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
     #endregion
 }
