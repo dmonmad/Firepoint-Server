@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ServerSend
 {
+
+    public static int nextUpdateWeaponBulletsPacketId = 1;
     /// <summary>Sends a packet to a client via TCP.</summary>
     /// <param name="_toClient">The client to send the packet the packet to.</param>
     /// <param name="_packet">The packet to send to the client.</param>
@@ -221,6 +223,36 @@ public class ServerSend
         {
             _packet.Write(_facing);
             _packet.Write(_byPlayer);
+
+            SendTCPDataToAll(_byPlayer, _packet);
+        }
+    }
+
+    public static void UpdateWeaponBullets(Weapon _weapon)
+    {
+        int _itemId = _weapon.itemId;
+        int _actualClip = _weapon.clip;
+        int _actualAmmo = _weapon.ammo;
+
+        using (Packet _packet = new Packet((int)ServerPackets.updateWeaponBullets))
+        {
+            _packet.Write(nextUpdateWeaponBulletsPacketId);
+            _packet.Write(_itemId);
+            _packet.Write(_actualClip);
+            _packet.Write(_actualAmmo);
+
+            SendTCPDataToAll(_packet);
+        }
+
+        nextUpdateWeaponBulletsPacketId++;
+    }
+
+    public static void PlayerChangeWeapon(int _byPlayer, int _index)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.playerChangedWeapon))
+        {
+            _packet.Write(_byPlayer);
+            _packet.Write(_index);
 
             SendTCPDataToAll(_packet);
         }

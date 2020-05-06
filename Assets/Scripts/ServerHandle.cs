@@ -53,5 +53,11 @@ public class ServerHandle
         Server.clients[_fromClient].player.DropWeapon(_dropDirection);
     }
 
+    public static void PlayerChangeWeapon(int _fromClient, Packet _packet)
+    {
+        int _index = _packet.ReadInt();
+
+        Server.clients[_fromClient].player.weaponManager.ChangeWeapon(_index);
+    }
 
 }

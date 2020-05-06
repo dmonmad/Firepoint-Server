@@ -130,7 +130,8 @@ public class Server
                 { (int)ClientPackets.welcomeReceived, ServerHandle.WelcomeReceived },
                 { (int)ClientPackets.playerInput, ServerHandle.PlayerMovement },
                 { (int)ClientPackets.playerShoot, ServerHandle.PlayerShoot },
-                { (int)ClientPackets.playerDropWeapon, ServerHandle.PlayerDropWeapon }
+                { (int)ClientPackets.playerDropWeapon, ServerHandle.PlayerDropWeapon },
+                { (int)ClientPackets.changeWeapon, ServerHandle.PlayerChangeWeapon }
             };
         Debug.Log("Initialized packets.");
     }

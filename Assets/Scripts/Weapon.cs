@@ -41,6 +41,7 @@ public class Weapon : MonoBehaviour
     public MeshCollider modelCollider;
     public int weaponId;
     public int itemId;
+    public int playerId;
 
     public int damagePerShot = 0;
     public bool isReloading;
@@ -64,11 +65,12 @@ public class Weapon : MonoBehaviour
         modelCollider = GetComponentInChildren<MeshCollider>();
         ammo = maxAmmo;
         clip = maxClip;
-        isReloading = true;
+        isReloading = false;
         isNextShotReady = true;
         preparingNextShot = false;
         isFiring = false;
         shotsPerSecond = 1f / fireRate;
+        playerId = 0;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -78,7 +80,7 @@ public class Weapon : MonoBehaviour
             Debug.Log("Tag = Player");
             Player _player = other.GetComponent<Player>();
             WeaponManager _wm = other.GetComponent<WeaponManager>();
-            if (_wm.AttemptToPickUp(this) && _player && _wm)
+            if (_wm.AttemptToPickUp(this) && _player)
             {
                 Debug.Log("Picked up");
                 ItemPickedUp(_player.id, _player.weaponHolder);
@@ -96,46 +98,47 @@ public class Weapon : MonoBehaviour
         weaponCollider.enabled = false;
         modelCollider.enabled = false;
         ServerSend.ItemPickedUp(itemId, _byPlayer);
-        
+
     }
 
     public void ItemDropped()
     {
         weaponCollider.enabled = true;
         modelCollider.enabled = true;
+        playerId = -1;
     }
 
     public void Shoot(Transform _shootOrigin, Vector3 _shootDirection)
     {
         if (isNextShotReady)
         {
-            if (clip > 0)
+            if (clip > 0 && !isReloading)
             {
+
                 switch (weaponShootType)
                 {
                     case WeaponShootType.Semi:
-                        SemiShot(_shootOrigin.forward);
-
+                        SemiShot(_shootOrigin, _shootDirection);
+                        TryToReload();
+                        ServerSend.UpdateWeaponBullets(this);
                         break;
 
                     case WeaponShootType.Automatic:
-                        AutomaticShot(_shootOrigin.forward);
-
+                        AutomaticShot(_shootOrigin, _shootDirection);
+                        TryToReload();
+                        ServerSend.UpdateWeaponBullets(this);
                         break;
                 }
-            }
-            else
-            {
-                Reload();
             }
         }
         else
         {
+            Debug.LogWarning("Packet is arriving too fast");
             if (!preparingNextShot)
             {
                 StartCoroutine(PrepareNextShot());
             }
-        }        
+        }
     }
 
     IEnumerator PrepareNextShot()
@@ -146,9 +149,9 @@ public class Weapon : MonoBehaviour
         isNextShotReady = true;
     }
 
-    public void AutomaticShot(Vector3 _shootDirection)
+    public void AutomaticShot(Transform _shootOrigin, Vector3 _shootDirection)
     {
-        ClientSend.PlayerShoot(_shootDirection);
+        RayShoot(_shootOrigin, _shootDirection);
         isFiring = true;
         isNextShotReady = false;
         clip--;
@@ -159,9 +162,9 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public void SemiShot(Vector3 _shootDirection)
+    public void SemiShot(Transform _shootOrigin, Vector3 _shootDirection)
     {
-        ClientSend.PlayerShoot(_shootDirection);
+        RayShoot(_shootOrigin, _shootDirection);
         isNextShotReady = false;
         clip--;
 
@@ -171,12 +174,73 @@ public class Weapon : MonoBehaviour
         }
     }
 
+    public void TryToReload()
+    {
+        if (!isReloading && clip <= 0)
+        {
+            if (ammo > 0)
+            {
+                Debug.Log("!isReloading = false and starting reload");
+                StartCoroutine(Reload());
+            }
+        }
+    }
+
     IEnumerator Reload()
     {
         isReloading = true;
         yield return new WaitForSeconds(reloadTime);
-        clip = maxClip;
+
+        int clipToReload = 0;
+
+        if (ammo == 0)
+        {
+            clipToReload = 0;
+        }
+        else if (ammo >= maxClip)
+        {
+            clipToReload = maxClip;
+        }
+        else if (ammo < maxClip)
+        {
+            clipToReload = ammo;
+        }
+
+        ammo -= clipToReload;
+        clip = clipToReload;
         isReloading = false;
+        Debug.Log("Reloading and sending new bullets [" + clip + "] and ammo = [" + ammo + "]");
+        ServerSend.UpdateWeaponBullets(this);
+    }
+
+    public void RayShoot(Transform _shootOrigin, Vector3 _shootDirection)
+    {
+
+        if (Physics.Raycast(_shootOrigin.position, _shootDirection, out RaycastHit _hit, 999f))
+        {
+            if (_hit.collider.CompareTag("Player"))
+            {
+                _hit.collider.GetComponent<Player>().TakeDamage(damagePerShot);
+            }
+            else
+            {
+                ServerSend.ApplyDecal(_hit.point, Quaternion.FromToRotation(Vector3.forward, _hit.normal));
+            }
+        }
+
+    }
+
+    private void OnEnable()
+    {
+        if (preparingNextShot)
+        {
+            StartCoroutine(PrepareNextShot());
+        }
+
+        if (isReloading)
+        {
+            StartCoroutine(Reload());
+        }
     }
 
 }

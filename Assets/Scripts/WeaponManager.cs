@@ -1,10 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class WeaponManager : MonoBehaviour
 {
     public GameObject[] Inventory = new GameObject[3];
+    public GameObject primary;
+    public GameObject secondary;
+    public GameObject knife;
     public int selectedIndex = -1;
     public int lastSelectedIndex = -1;
     public float dropForce = 30f;
@@ -24,9 +28,10 @@ public class WeaponManager : MonoBehaviour
                 Debug.Log("Guardando arma en el slot " + i);
                 Inventory[i] = _weapon.gameObject;
                 selectedIndex = i;
-                Rigidbody _rb = Inventory[i].GetComponent<Rigidbody>();
+                Rigidbody _rb = _weapon.GetComponent<Rigidbody>();
                 if (_rb)
                 {
+                    Debug.Log("DESACTIVANDO RB FROM " + _rb.name);
                     _rb.isKinematic = true;
                     return true;
                 }
@@ -60,13 +65,25 @@ public class WeaponManager : MonoBehaviour
                         Inventory[selectedIndex] = null;
                         selectedIndex = -1;
                         _rb.isKinematic = false;
-                        _rb.AddForce(gameObject.transform.forward * dropForce, ForceMode.Force);
+                        _rb.AddForce(_dropVector * dropForce, ForceMode.Force);
                         return true;
                     }
                 }
             }
         }
         return false;
+    }
+
+    public void DropAllWeapons(Transform _weaponDropper)
+    {
+        for (int i = 0; i < Inventory.Length; i++)
+        {
+            if (Inventory[i])
+            {
+                selectedIndex = i;
+                DropActualWeapon(gameObject.transform.forward, _weaponDropper);
+            }
+        }
     }
 
     public void FireWeapon(Transform _shootOrigin, Vector3 _shootDirection)
@@ -78,4 +95,17 @@ public class WeaponManager : MonoBehaviour
 
     }
 
+    public void ChangeWeapon(int _index)
+    {
+        if (Inventory[_index] != null)
+        {
+            if (_index != selectedIndex)
+            {
+                ServerSend.PlayerChangeWeapon(GetComponent<Player>().id, _index);
+                Inventory[selectedIndex].SetActive(false);
+                selectedIndex = _index;
+                Inventory[selectedIndex].SetActive(true);
+            }
+        }
+    }
 }

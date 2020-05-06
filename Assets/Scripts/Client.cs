@@ -232,6 +232,7 @@ public class Client
 
         ThreadManager.ExecuteOnMainThread(() =>
         {
+            player.weaponManager.DropAllWeapons(player.weaponDropper);
             UnityEngine.Object.Destroy(player.gameObject);
 
             player = null;

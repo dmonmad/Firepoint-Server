@@ -142,14 +142,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponName: 5
   weaponTier: 0
+  weaponShootType: 1
   weaponCollider: {fileID: 0}
   modelCollider: {fileID: 0}
   weaponId: 0
   itemId: 0
   damagePerShot: 25
-  maxAmmo: 0
-  ammoClip: 0
-  fireRate: 0
+  isReloading: 0
+  preparingNextShot: 0
+  isFiring: 0
+  isNextShotReady: 0
+  reloadTime: 2.3
+  maxAmmo: 180
+  ammo: 0
+  maxClip: 30
+  clip: 0
+  fireRate: 12
+  shotsPerSecond: 0
 --- !u!65 &7244004042322450641
 BoxCollider:
   m_ObjectHideFlags: 0

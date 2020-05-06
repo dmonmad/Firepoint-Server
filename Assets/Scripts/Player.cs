@@ -67,20 +67,6 @@ public class Player : MonoBehaviour
         Move(_inputDirection);
     }
 
-    public void DropWeapon(Vector3 _dropVector)
-    {
-        Debug.Log("DropWeapon");
-        if (health <= 0)
-        {
-            return;
-        }
-
-        if (weaponManager.DropActualWeapon(_dropVector, weaponDropper))
-        {
-            ServerSend.PlayerThrowWeapon(_dropVector, id);
-        }
-    }
-
     /// <summary>Calculates the player's desired movement direction and moves him.</summary>
     /// <param name="_inputDirection"></param>
     private void Move(Vector2 _inputDirection)
@@ -114,6 +100,20 @@ public class Player : MonoBehaviour
         transform.rotation = _rotation;
     }
 
+    public void DropWeapon(Vector3 _dropVector)
+    {
+        Debug.Log("DropWeapon");
+        if (health <= 0)
+        {
+            return;
+        }
+
+        if (weaponManager.DropActualWeapon(_dropVector, weaponDropper))
+        {
+            ServerSend.PlayerThrowWeapon(_dropVector, id);
+        }
+    }
+
     public void Shoot(Vector3 _viewDirection)
     {
         if (health <= 0)
@@ -123,12 +123,6 @@ public class Player : MonoBehaviour
 
         weaponManager.FireWeapon(shootOrigin, _viewDirection);
         
-    }
-
-    public void Shoot2()
-    {
-        //weaponManager.FireWeapon2();
-
     }
 
     public void TakeDamage(float _damage)
