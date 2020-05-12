@@ -41,7 +41,7 @@ public class Weapon : MonoBehaviour
     public MeshCollider modelCollider;
     public int weaponId;
     public int itemId;
-    public int playerId;
+    public int holdedByPlayer;
 
     public int damagePerShot = 0;
     public bool isReloading;
@@ -70,42 +70,36 @@ public class Weapon : MonoBehaviour
         preparingNextShot = false;
         isFiring = false;
         shotsPerSecond = 1f / fireRate;
-        playerId = 0;
+        holdedByPlayer = -1;
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player")
         {
-            Debug.Log("Tag = Player");
             Player _player = other.GetComponent<Player>();
             WeaponManager _wm = other.GetComponent<WeaponManager>();
-            if (_wm.AttemptToPickUp(this) && _player)
+            if (_wm.AttemptToPickUp(this, _player.weaponHolder, _player.id) && _player)
             {
-                Debug.Log("Picked up");
-                ItemPickedUp(_player.id, _player.weaponHolder);
+                ItemPickedUp(_player.id);
             }
 
         }
     }
 
-    private void ItemPickedUp(int _byPlayer, Transform _weaponHolder)
+    private void ItemPickedUp(int id)
     {
         Debug.Log("Item guardado, enviando ");
-        gameObject.transform.parent = _weaponHolder;
-        gameObject.transform.localPosition = Vector3.zero;
-        gameObject.transform.rotation = new Quaternion(0, 0, 0, 0);
         weaponCollider.enabled = false;
         modelCollider.enabled = false;
-        ServerSend.ItemPickedUp(itemId, _byPlayer);
-
+        holdedByPlayer = id;
     }
 
     public void ItemDropped()
     {
         weaponCollider.enabled = true;
         modelCollider.enabled = true;
-        playerId = -1;
+        holdedByPlayer = -1;
     }
 
     public void Shoot(Transform _shootOrigin, Vector3 _shootDirection)

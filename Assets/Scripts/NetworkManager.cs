@@ -45,7 +45,12 @@ public class NetworkManager : MonoBehaviour
 
     public Player InstantiatePlayer()
     {
-        return Instantiate(playerPrefab, MapManager.GetRandomSpawner(), Quaternion.identity).GetComponent<Player>();
+        return Instantiate(playerPrefab, MapManager.GetRandomPlayerSpawner(), Quaternion.identity).GetComponent<Player>();
+    }
+
+    public Weapon InstantiateWeapon()
+    {
+        return Instantiate(playerPrefab, MapManager.GetRandomWeaponSpawner(), Quaternion.identity).GetComponent<Weapon>();
     }
 
     public GameObject GetWeapon(int _id)

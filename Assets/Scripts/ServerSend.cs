@@ -102,6 +102,7 @@ public class ServerSend
             _packet.Write(_player.username);
             _packet.Write(_player.transform.position);
             _packet.Write(_player.transform.rotation);
+            //_packet.Write(_player.weaponManager.Inventory[_player.weaponManager.selectedIndex].GetComponent<Weapon>().itemId);
 
             SendTCPData(_toClient, _packet);
         }
@@ -184,25 +185,18 @@ public class ServerSend
         }
     }
 
-    public static void CreateItemSpawner(int _toClient, int _weaponId, int _itemId, Vector3 _itemPosition)
+    public static void SpawnItem(int _toClient, int _weaponId, int _itemId, Vector3 _itemPosition, int _heldBy, int _bullets, int _ammo)
     {
-        using (Packet _packet = new Packet((int)ServerPackets.createItemSpawner))
+        using (Packet _packet = new Packet((int)ServerPackets.spawnItem))
         {
             _packet.Write(_weaponId);
             _packet.Write(_itemId);
             _packet.Write(_itemPosition);
+            _packet.Write(_heldBy);
+            _packet.Write(_bullets);
+            _packet.Write(_ammo);
 
             SendTCPData(_toClient, _packet);
-        }
-    }
-
-    public static void ItemSpawned(int _spawnerId)
-    {
-        using (Packet _packet = new Packet((int)ServerPackets.itemSpawned))
-        {
-            _packet.Write(_spawnerId);
-
-            SendTCPDataToAll(_packet);
         }
     }
 

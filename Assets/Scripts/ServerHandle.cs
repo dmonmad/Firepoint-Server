@@ -47,7 +47,6 @@ public class ServerHandle
 
     public static void PlayerDropWeapon(int _fromClient, Packet _packet)
     {
-        Debug.Log("Receiving PlayerDropWeapon");
         Vector3 _dropDirection = _packet.ReadVector3();
 
         Server.clients[_fromClient].player.DropWeapon(_dropDirection);

@@ -32,8 +32,13 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    public static Vector3 GetRandomSpawner()
+    public static Vector3 GetRandomPlayerSpawner()
     {
         return playerSpawnPositions[UnityEngine.Random.Range(0, playerSpawnPositions.Count - 1)].position;
+    }
+
+    public static Vector3 GetRandomWeaponSpawner()
+    {
+        return itemSpawnPositions[UnityEngine.Random.Range(0, playerSpawnPositions.Count - 1)].position;
     }
 }

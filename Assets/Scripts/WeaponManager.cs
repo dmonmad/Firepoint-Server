@@ -16,25 +16,31 @@ public class WeaponManager : MonoBehaviour
     public void Start()
     {
         selectedIndex = -1;
+        dropForce = Constants.DROP_WEAPON_FORCE;
     }
 
-    public bool AttemptToPickUp(Weapon _weapon)
+    public bool AttemptToPickUp(Weapon _weapon, Transform _weaponHolder, int _byPlayer)
     {
-        Debug.Log("AttempToPickup");
         for (int i = 0; i < Inventory.Length; i++)
         {
             if (Inventory[i] == null)
             {
-                Debug.Log("Guardando arma en el slot " + i);
                 Inventory[i] = _weapon.gameObject;
-                selectedIndex = i;
+
+                if (selectedIndex == -1)
+                {
+                    selectedIndex = i;
+                }
+
                 Rigidbody _rb = _weapon.GetComponent<Rigidbody>();
                 if (_rb)
                 {
-                    Debug.Log("DESACTIVANDO RB FROM " + _rb.name);
                     _rb.isKinematic = true;
-                    return true;
                 }
+                _weapon.gameObject.transform.parent = _weaponHolder;
+                _weapon.gameObject.transform.localPosition = Vector3.zero;
+                _weapon.gameObject.transform.rotation = new Quaternion(0, 0, 0, 0);
+                ServerSend.ItemPickedUp(_weapon.itemId, _byPlayer);
                 return true;
             }
         }
@@ -44,7 +50,6 @@ public class WeaponManager : MonoBehaviour
 
     public bool DropActualWeapon(Vector3 _dropVector, Transform _weaponDropper)
     {
-        Debug.Log("DropActualWeapon");
         if (Inventory[selectedIndex])
         {
             Debug.Log("DropActualWeapon - Selected Weapon");
@@ -81,6 +86,8 @@ public class WeaponManager : MonoBehaviour
             if (Inventory[i])
             {
                 selectedIndex = i;
+                Debug.Log(Inventory[selectedIndex].name);
+                Inventory[selectedIndex].SetActive(true);
                 DropActualWeapon(gameObject.transform.forward, _weaponDropper);
             }
         }
@@ -102,7 +109,8 @@ public class WeaponManager : MonoBehaviour
             if (_index != selectedIndex)
             {
                 ServerSend.PlayerChangeWeapon(GetComponent<Player>().id, _index);
-                Inventory[selectedIndex].SetActive(false);
+                if (selectedIndex != -1)
+                    Inventory[selectedIndex].SetActive(false);
                 selectedIndex = _index;
                 Inventory[selectedIndex].SetActive(true);
             }

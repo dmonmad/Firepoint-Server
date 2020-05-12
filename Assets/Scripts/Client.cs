@@ -222,7 +222,7 @@ public class Client
 
         foreach(Weapon _item in Weapon.items.Values)
         {
-            ServerSend.CreateItemSpawner(id, (int)_item.weaponName, _item.itemId, _item.transform.position);
+            ServerSend.SpawnItem(id, (int)_item.weaponName, _item.itemId, _item.transform.position, _item.holdedByPlayer, _item.clip, _item.ammo);
         }
     }
 
