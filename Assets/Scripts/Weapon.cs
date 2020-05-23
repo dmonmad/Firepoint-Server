@@ -102,7 +102,7 @@ public class Weapon : MonoBehaviour
         holdedByPlayer = -1;
     }
 
-    public void Shoot(Transform _shootOrigin, Vector3 _shootDirection)
+    public bool Shoot(Transform _shootOrigin, Vector3 _shootDirection)
     {
         if (isNextShotReady)
         {
@@ -113,15 +113,21 @@ public class Weapon : MonoBehaviour
                 {
                     case WeaponShootType.Semi:
                         SemiShot(_shootOrigin, _shootDirection);
-                        TryToReload();
+                        if (clip <= 0)
+                        {
+                            TryToReload();
+                        }
                         ServerSend.UpdateWeaponBullets(this);
-                        break;
+                        return true;
 
                     case WeaponShootType.Automatic:
                         AutomaticShot(_shootOrigin, _shootDirection);
-                        TryToReload();
+                        if (clip <= 0)
+                        {
+                            TryToReload();
+                        }
                         ServerSend.UpdateWeaponBullets(this);
-                        break;
+                        return true;
                 }
             }
         }
@@ -133,6 +139,7 @@ public class Weapon : MonoBehaviour
                 StartCoroutine(PrepareNextShot());
             }
         }
+        return false;
     }
 
     IEnumerator PrepareNextShot()
@@ -170,7 +177,7 @@ public class Weapon : MonoBehaviour
 
     public void TryToReload()
     {
-        if (!isReloading && clip <= 0)
+        if (!isReloading)
         {
             if (ammo > 0)
             {
@@ -185,23 +192,31 @@ public class Weapon : MonoBehaviour
         isReloading = true;
         yield return new WaitForSeconds(reloadTime);
 
-        int clipToReload = 0;
+        int newClipAfterReload = 0;
+        int newAmmoAfterReload = 0;
 
         if (ammo == 0)
         {
-            clipToReload = 0;
+            newClipAfterReload = clip;
+            newAmmoAfterReload = 0;
         }
-        else if (ammo >= maxClip)
+        else 
         {
-            clipToReload = maxClip;
-        }
-        else if (ammo < maxClip)
-        {
-            clipToReload = ammo;
+            int ammoDifference = (clip + ammo) - maxClip;
+            if (ammoDifference >= 0)
+            {
+                newClipAfterReload = maxClip;
+                newAmmoAfterReload = Mathf.Abs(ammoDifference);
+            }
+            else
+            {
+                newClipAfterReload = clip + ammo;
+                newAmmoAfterReload = 0;
+            }
         }
 
-        ammo -= clipToReload;
-        clip = clipToReload;
+        clip = newClipAfterReload;
+        ammo = newAmmoAfterReload;
         isReloading = false;
         Debug.Log("Reloading and sending new bullets [" + clip + "] and ammo = [" + ammo + "]");
         ServerSend.UpdateWeaponBullets(this);
@@ -226,12 +241,14 @@ public class Weapon : MonoBehaviour
 
     private void OnEnable()
     {
+        isReloading = false;
+
         if (preparingNextShot)
         {
             StartCoroutine(PrepareNextShot());
         }
 
-        if (isReloading)
+        if (clip < 0)
         {
             StartCoroutine(Reload());
         }

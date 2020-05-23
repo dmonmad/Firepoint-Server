@@ -97,9 +97,26 @@ public class WeaponManager : MonoBehaviour
     {
         if (selectedIndex != -1)
         {
-            Inventory[selectedIndex].GetComponent<Weapon>().Shoot(_shootOrigin, _shootDirection);
-        }
+            if(Inventory[selectedIndex].GetComponent<Weapon>().Shoot(_shootOrigin, _shootDirection))
+            {
 
+                ServerSend.PlayerShot(GetComponent<Player>().id);
+            }
+        }
+    }
+
+    public void ReloadWeapon()
+    {
+        Debug.Log("ReloadWeapon()");
+        if(selectedIndex != -1)
+        {
+            Debug.Log("selectedIndex != -1");
+            if (Inventory[selectedIndex])
+            {
+                Debug.Log("Inventory[SelectedIndex]");
+                Inventory[selectedIndex].GetComponent<Weapon>().TryToReload();
+            }
+        }
     }
 
     public void ChangeWeapon(int _index)

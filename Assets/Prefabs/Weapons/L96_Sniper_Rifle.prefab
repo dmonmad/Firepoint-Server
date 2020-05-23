@@ -148,6 +148,7 @@ MonoBehaviour:
   modelCollider: {fileID: 0}
   weaponId: 0
   itemId: 0
+  holdedByPlayer: 0
   damagePerShot: 100
   isReloading: 0
   preparingNextShot: 0
@@ -158,7 +159,7 @@ MonoBehaviour:
   ammo: 0
   maxClip: 8
   clip: 0
-  fireRate: 0.9
+  fireRate: 0.68
   shotsPerSecond: 0
 --- !u!65 &2350967424512371890
 BoxCollider:
