@@ -35,7 +35,8 @@ public class NetworkManager : MonoBehaviour
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 30;
 
-        Server.Start(50, 26950);
+        Server.Start(Constants.MAX_PLAYERS, Constants.PORT);
+        ConnectWithMasterServer();
     }
 
     private void OnApplicationQuit()
@@ -65,5 +66,11 @@ public class NetworkManager : MonoBehaviour
         {
             Weapon.weapons.Add((int)weapon.GetComponent<Weapon>().weaponName, weapon);
         }
+    }
+
+    private void ConnectWithMasterServer()
+    {
+        Debug.Log("Connecting with master server...");
+        StartCoroutine(RestClient._instance.Post(Constants.MASTERSERVER_URL, new ServerModel(Constants.HOST_NAME, Time.time)));
     }
 }

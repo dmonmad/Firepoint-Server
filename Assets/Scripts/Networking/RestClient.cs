@@ -5,35 +5,44 @@ using UnityEngine.Networking;
 
 public class RestClient : MonoBehaviour
 {
-    private static RestClient _instance;
+    public static RestClient _instance;
 
     private RestClient() { }
 
-    public static RestClient GetInstance()
+    public void Awake()
     {
         if (!_instance)
         {
-            _instance = new RestClient();
+            _instance = this;
         }
-        return _instance;
+        else
+        {
+            Destroy(this);
+        }
     }
 
-    public IEnumerator Get(string url)
+    public IEnumerator Post(string url, ServerModel server)
     {
-        using (UnityWebRequest www = UnityWebRequest.Get(url))
+        string jsonData = JsonUtility.ToJson(server);
+        Debug.Log(jsonData);
+        using (UnityWebRequest www = UnityWebRequest.Post(url, jsonData))
         {
+            www.SetRequestHeader("content-type", "application/json");
+            www.uploadHandler.contentType = "application/json";
+            www.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
+
             yield return www.SendWebRequest();
 
             if (www.isNetworkError)
             {
-                Debug.LogError(www.error);
+                Debug.LogError("Server couldn't connect with master-server: \n["+ www.error+"]");
             }
             else
             {
                 if (www.isDone)
                 {
                     string jsonResult = System.Text.Encoding.UTF8.GetString(www.downloadHandler.data);
-                    Debug.Log(jsonResult);
+                    Debug.Log("Server added to master-server correctly");
                 }
             }
         }

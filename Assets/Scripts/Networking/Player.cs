@@ -125,7 +125,7 @@ public class Player : MonoBehaviour
         
     }
 
-    public void TakeDamage(float _damage)
+    public void TakeDamage(float _damage, int _attackerId)
     {
         Debug.Log("Take Damage on "+username);
         if (health <= 0)
@@ -145,7 +145,7 @@ public class Player : MonoBehaviour
             StartCoroutine(Respawn());
         }
 
-        ServerSend.PlayerHealth(this);
+        ServerSend.PlayerHealth(this, _attackerId);
     }
 
     private IEnumerator Respawn()

@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class ServerModel : MonoBehaviour
+public class ServerModel
 {
-    private string name;
-    private string ip;
-    private float lastupdate;
+    public int id;
+    public string servername;
+    public string ip;
+    public float lastupdate;
 
-    public ServerModel(string name, string ip, float lastupdate)
+    public ServerModel(string name, float lastupdate)
     {
-        this.name = name;
-        this.ip = ip;
+        this.servername = name;
+        this.ip = Constants.PORT.ToString();
         this.lastupdate = lastupdate;
     }
 
-    public string Name { get => name; set => name = value; }
-    public string Ip { get => ip; set => ip = value; }
+    public string Name { get => servername; set => servername = value; }
     public float Lastupdate { get => lastupdate; set => lastupdate = value; }
 }

@@ -149,11 +149,12 @@ public class ServerSend
 
     /// <summary>Sends a player's updated health to all clients.</summary>
     /// <param name="_player">The player whose health to update.</param>
-    public static void PlayerHealth(Player _player)
+    public static void PlayerHealth(Player _player, int _attackerId)
     {
         using (Packet _packet = new Packet((int)ServerPackets.playerHealth))
         {
             _packet.Write(_player.id);
+            _packet.Write(_attackerId);
             _packet.Write(_player.health);
 
             SendTCPDataToAll(_packet);
