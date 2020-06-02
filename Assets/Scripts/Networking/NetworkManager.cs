@@ -44,21 +44,28 @@ public class NetworkManager : MonoBehaviour
         Server.Stop();
     }
 
+    /// <summary>Spawns a player.</summary>
+    /// <returns>Player object</returns>
     public Player InstantiatePlayer()
     {
         return Instantiate(playerPrefab, MapManager.GetRandomPlayerSpawner(), Quaternion.identity).GetComponent<Player>();
     }
 
+    /// <summary>Spawns a weapon.</summary>
+    /// <returns>Weapon object</returns>
     public Weapon InstantiateWeapon()
     {
         return Instantiate(playerPrefab, MapManager.GetRandomWeaponSpawner(), Quaternion.identity).GetComponent<Weapon>();
     }
 
+    /// <summary>Get a GameObject weapon from it's id.</summary>
+    /// <returns>GameObject of the weapon's id</returns>
     public GameObject GetWeapon(int _id)
     {
         return Weapon.weapons[_id];
     }
 
+    /// <summary>Populates the Weapon's Dictionary with weapons by ID.</summary>
     private void PopulateDictionaryWithWeapons()
     {
 
@@ -68,6 +75,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    /// <summary>Sends this server information to the master server</summary>
     private void ConnectWithMasterServer()
     {
         Debug.Log("Connecting with master server...");

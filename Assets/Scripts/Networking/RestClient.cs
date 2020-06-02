@@ -21,10 +21,12 @@ public class RestClient : MonoBehaviour
         }
     }
 
+    /// <summary>Sends the server info to the remote server.</summary>
+    /// <param name="url">Url of the remote server.</param>
+    /// <param name="server">Server information.</param>
     public IEnumerator Post(string url, ServerModel server)
     {
         string jsonData = JsonUtility.ToJson(server);
-        Debug.Log(jsonData);
         using (UnityWebRequest www = UnityWebRequest.Post(url, jsonData))
         {
             www.SetRequestHeader("content-type", "application/json");

@@ -28,6 +28,9 @@ public class Player : MonoBehaviour
         jumpSpeed *= Time.fixedDeltaTime;
     }
 
+    /// <summary>Initializes the player with the given values and sets the health to the max value possible.</summary>
+    /// <param name="_id">The player's id.</param>
+    /// <param name="_username">The player's username.</param>
     public void Initialize(int _id, string _username)
     {
         id = _id;
@@ -100,9 +103,10 @@ public class Player : MonoBehaviour
         transform.rotation = _rotation;
     }
 
+    /// <summary>Try to drop the weapon and, if it does, sends the command to the other players. .</summary>
+    /// <param name="_dropVector">The origin where the shot will be originated.</param>
     public void DropWeapon(Vector3 _dropVector)
     {
-        Debug.Log("DropWeapon");
         if (health <= 0)
         {
             return;
@@ -111,9 +115,12 @@ public class Player : MonoBehaviour
         if (weaponManager.DropActualWeapon(_dropVector, weaponDropper))
         {
             ServerSend.PlayerThrowWeapon(_dropVector, id);
+            Debug.Log(username + " dropped a gun");
         }
     }
 
+    /// <summary>Shoots the weapon.</summary>
+    /// <param name="_viewDirection">The vector the shoot will follow.</param>
     public void Shoot(Vector3 _viewDirection)
     {
         if (health <= 0)
@@ -125,19 +132,21 @@ public class Player : MonoBehaviour
         
     }
 
+    /// <summary>Takes damage and kills the player if under 0.</summary>
+    /// <param name="_damage">The origin where the shot will be originated.</param>
+    /// <param name="_attackerId">The vector that the shot will travel.</param>
     public void TakeDamage(float _damage, int _attackerId)
     {
-        Debug.Log("Take Damage on "+username);
+        
         if (health <= 0)
         {
             return;
         }
 
-        Debug.Log("Take Damage health - damage " + username);
         health -= _damage;
+        Debug.Log(username + "takes " + _damage + " of damage");
         if (health <= 0f)
         {
-            Debug.Log("Take Damage on " + username);
             health = 0f;
             controller.enabled = false;
             transform.position = new Vector3(0f, 25f, 0f);
@@ -148,6 +157,8 @@ public class Player : MonoBehaviour
         ServerSend.PlayerHealth(this, _attackerId);
     }
 
+    /// <summary>Respawns after delay, setting full health and enabling controller 
+    /// then sends the event to the other players.</summary>
     private IEnumerator Respawn()
     {
         yield return new WaitForSeconds(5f);

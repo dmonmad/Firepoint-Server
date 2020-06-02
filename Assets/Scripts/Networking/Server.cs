@@ -137,6 +137,7 @@ public class Server
         Debug.Log("Initialized packets.");
     }
 
+    /// <summary>Closes TCPListener and UDPListener</summary>
     public static void Stop()
     {
         tcpListener.Stop();

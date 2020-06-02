@@ -87,14 +87,16 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    private void ItemPickedUp(int id)
+    /// <summary>Disables the colliders from the weapon's object so it doesn't collide while holded and set the holder's id.</summary>
+    /// <param name="_playerId">The player's id who picked the weapon up.</param>
+    private void ItemPickedUp(int _playerId)
     {
-        Debug.Log("Item guardado, enviando ");
         weaponCollider.enabled = false;
         modelCollider.enabled = false;
-        holdedByPlayer = id;
+        holdedByPlayer = _playerId;
     }
 
+    /// <summary>Enables the colliders from the weapon's object and sets the holder's id to -1.</summary>
     public void ItemDropped()
     {
         weaponCollider.enabled = true;
@@ -102,6 +104,10 @@ public class Weapon : MonoBehaviour
         holdedByPlayer = -1;
     }
 
+    /// <summary>Checks if the weapon can shoot and, if it do, shoots.</summary>
+    /// <param name="_shootOrigin">The origin where the shot will be originated.</param>
+    /// <param name="_shootDirection">The vector that the shot will travel.</param>
+    /// <returns>Returns whether the shot was executed or not</returns>
     public bool Shoot(Transform _shootOrigin, Vector3 _shootDirection)
     {
         if (isNextShotReady)
@@ -142,6 +148,8 @@ public class Weapon : MonoBehaviour
         return false;
     }
 
+
+    /// <summary>Prepares the next shot in the time specified.</summary>
     IEnumerator PrepareNextShot()
     {
         preparingNextShot = true;
@@ -150,6 +158,9 @@ public class Weapon : MonoBehaviour
         isNextShotReady = true;
     }
 
+    /// <summary>Takes a shot in automatic mode.</summary>
+    /// <param name="_shootOrigin">The origin where the shot will be originated.</param>
+    /// <param name="_shootDirection">The vector that the shot will travel.</param>
     public void AutomaticShot(Transform _shootOrigin, Vector3 _shootDirection)
     {
         RayShoot(_shootOrigin, _shootDirection);
@@ -163,6 +174,9 @@ public class Weapon : MonoBehaviour
         }
     }
 
+    /// <summary>Takes a shot in semi-automatic mode.</summary>
+    /// <param name="_shootOrigin">The origin where the shot will be originated.</param>
+    /// <param name="_shootDirection">The vector that the shot will travel.</param>
     public void SemiShot(Transform _shootOrigin, Vector3 _shootDirection)
     {
         RayShoot(_shootOrigin, _shootDirection);
@@ -175,18 +189,19 @@ public class Weapon : MonoBehaviour
         }
     }
 
+    /// <summary>Tries to reload the weapon checking ammo left.</summary>
     public void TryToReload()
     {
         if (!isReloading)
         {
-            if (ammo > 0)
+            if (ammo > 0 && clip < maxClip)
             {
-                Debug.Log("!isReloading = false and starting reload");
                 StartCoroutine(Reload());
             }
         }
     }
 
+    /// <summary>Reloads the weapon substracting bullets from the ammo untill the magazine is full.</summary>
     IEnumerator Reload()
     {
         isReloading = true;
@@ -222,6 +237,9 @@ public class Weapon : MonoBehaviour
         ServerSend.UpdateWeaponBullets(this);
     }
 
+    /// <summary>Takes a shot. If a surface is hit, a decal is spawned. If a player is, the player takes damage.</summary>
+    /// <param name="_shootOrigin">The origin where the shot will be originated.</param>
+    /// <param name="_shootDirection">The vector that the shot will travel.</param>
     public void RayShoot(Transform _shootOrigin, Vector3 _shootDirection)
     {
 

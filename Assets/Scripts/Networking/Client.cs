@@ -196,6 +196,8 @@ public class Client
         }
     }
 
+    /// <summary>Sends all the players and weapons in the server to the client.</summary>
+    /// <param name="_playername">The player who's about to spawn name's.</param>
     public void SendIntoGame(string _playername)
     {
         player = NetworkManager.instance.InstantiatePlayer();
@@ -226,6 +228,7 @@ public class Client
         }
     }
 
+    /// <summary>Closes a client's connection.</summary>
     private void Disconnect()
     {
         Debug.Log($"{tcp.socket.Client.RemoteEndPoint} has disconnected.");

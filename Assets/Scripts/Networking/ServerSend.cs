@@ -149,6 +149,7 @@ public class ServerSend
 
     /// <summary>Sends a player's updated health to all clients.</summary>
     /// <param name="_player">The player whose health to update.</param>
+    /// <param name="_attackerId">The id of the player who attacked.</param>
     public static void PlayerHealth(Player _player, int _attackerId)
     {
         using (Packet _packet = new Packet((int)ServerPackets.playerHealth))
@@ -162,7 +163,7 @@ public class ServerSend
     }
 
     /// <summary>Sends a player's updated rotation to all clients except to himself (to avoid overwriting the local player's rotation).</summary>
-    /// <param name="_player">The player whose rotation to update.</param>
+    /// <param name="_player">The player who respawned.</param>
     public static void PlayerRespawned(Player _player)
     {
         using (Packet _packet = new Packet((int)ServerPackets.playerRespawned))
@@ -174,7 +175,8 @@ public class ServerSend
     }
 
     /// <summary>Sends a player's updated rotation to all clients except to himself (to avoid overwriting the local player's rotation).</summary>
-    /// <param name="_player">The player whose rotation to update.</param>
+    /// <param name="_player">The position of the decal.</param>
+    /// <param name="_player">The rotation of the decal.</param>
     public static void ApplyDecal(Vector3 _hitPosition, Quaternion _hitRotation)
     {
         using (Packet _packet = new Packet((int)ServerPackets.applyDecal))
@@ -186,6 +188,14 @@ public class ServerSend
         }
     }
 
+    /// <summary>Sends a player's updated rotation to all clients except to himself (to avoid overwriting the local player's rotation).</summary>
+    /// <param name="_toClient">The id of the client who should be sent the packet.</param>
+    /// <param name="_weaponId">The identifier of the weapon to spawn the same one.</param>
+    /// <param name="_itemId">The id of the weapon.</param>
+    /// <param name="_itemPosition">The position of the weapon.</param>
+    /// <param name="_heldBy">The id of the player who holds the weapon.</param>
+    /// <param name="_bullets">The bullets in the magazine of the weapon.</param>
+    /// <param name="_ammo">The ammo of the weapon.</param>
     public static void SpawnItem(int _toClient, int _weaponId, int _itemId, Vector3 _itemPosition, int _heldBy, int _bullets, int _ammo)
     {
         using (Packet _packet = new Packet((int)ServerPackets.spawnItem))
@@ -201,6 +211,9 @@ public class ServerSend
         }
     }
 
+    /// <summary>Sends a player's updated rotation to all clients except to himself (to avoid overwriting the local player's rotation).</summary>
+    /// <param name="_itemId">The id of the weapon that has been picked up.</param>
+    /// <param name="_byPlayer">The id of the player who picked the weapon up.</param>
     public static void ItemPickedUp(int _itemId, int _byPlayer)
     {
         using (Packet _packet = new Packet((int)ServerPackets.itemPickedUp))
@@ -212,6 +225,9 @@ public class ServerSend
         }
     }
 
+    /// <summary>Sends a player's updated rotation to all clients except to himself (to avoid overwriting the local player's rotation).</summary>
+    /// <param name="_facing">The vector where the weapon should be thrown to.</param>
+    /// <param name="_byPlayer">The id of the client who must throw the weapon.</param>
     public static void PlayerThrowWeapon(Vector3 _facing, int _byPlayer)
     {
         using (Packet _packet = new Packet((int)ServerPackets.itemThrown))
@@ -223,6 +239,8 @@ public class ServerSend
         }
     }
 
+    /// <summary>Sends a player's updated rotation to all clients except to himself (to avoid overwriting the local player's rotation).</summary>
+    /// <param name="_weapon">The weapon whose bullets should be updated.</param>
     public static void UpdateWeaponBullets(Weapon _weapon)
     {
         int _itemId = _weapon.itemId;
@@ -242,6 +260,9 @@ public class ServerSend
         nextUpdateWeaponBulletsPacketId++;
     }
 
+    /// <summary>Sends a player's updated rotation to all clients except to himself (to avoid overwriting the local player's rotation).</summary>
+    /// <param name="_byPlayer">The id of the client who has changed the weapon.</param>
+    /// <param name="_index">The index of the weapon to be changed.</param>
     public static void PlayerChangeWeapon(int _byPlayer, int _index)
     {
         using (Packet _packet = new Packet((int)ServerPackets.playerChangedWeapon))
@@ -253,6 +274,8 @@ public class ServerSend
         }
     }
 
+    /// <summary>Sends a player's updated rotation to all clients except to himself (to avoid overwriting the local player's rotation).</summary>
+    /// <param name="_byPlayer">The id of the player who shot.</param>
     public static void PlayerShot(int _byPlayer)
     {
         using (Packet _packet = new Packet((int)ServerPackets.playerShot))

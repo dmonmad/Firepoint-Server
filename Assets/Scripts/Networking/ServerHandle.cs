@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class ServerHandle
 {
+    /// <summary>Processes the first message sent from a player.</summary>
+    /// <param name="_fromClient">The client sender's id.</param>
+    /// <param name="_packet">The packet with the info from the player.</param>
     public static void WelcomeReceived(int _fromClient, Packet _packet)
     {
         int _clientIdCheck = _packet.ReadInt();
@@ -18,6 +21,9 @@ public class ServerHandle
         Server.clients[_fromClient].SendIntoGame(_username);
     }
 
+    /// <summary>Processes the inputs sent from the player.</summary>
+    /// <param name="_fromClient">The client sender's id.</param>
+    /// <param name="_packet">The packet with the info from the player.</param>
     public static void PlayerMovement(int _fromClient, Packet _packet)
     {
         bool[] _inputs = new bool[_packet.ReadInt()];
@@ -30,6 +36,9 @@ public class ServerHandle
         Server.clients[_fromClient].player.SetInput(_inputs, _rotation);
     }
 
+    /// <summary>Processes the shoot input sent from a player.</summary>
+    /// <param name="_fromClient">The client sender's id.</param>
+    /// <param name="_packet">The packet with the info from the player.</param>
     public static void PlayerShoot(int _fromClient, Packet _packet)
     {
         Vector3 _shootDirection = _packet.ReadVector3();
@@ -38,13 +47,9 @@ public class ServerHandle
 
     }
 
-    public static void PlayerBuy(int _fromClient, Packet _packet)
-    {
-        Vector3 _shootDirection = _packet.ReadVector3();
-
-        Server.clients[_fromClient].player.Shoot(_shootDirection);
-    }
-
+    /// <summary>Processes the drop weapon input sent from a player.</summary>
+    /// <param name="_fromClient">The client sender's id.</param>
+    /// <param name="_packet">The packet with the info from the player.</param>
     public static void PlayerDropWeapon(int _fromClient, Packet _packet)
     {
         Vector3 _dropDirection = _packet.ReadVector3();
@@ -52,6 +57,9 @@ public class ServerHandle
         Server.clients[_fromClient].player.DropWeapon(_dropDirection);
     }
 
+    /// <summary>Processes the change weapon input sent from a player.</summary>
+    /// <param name="_fromClient">The client sender's id.</param>
+    /// <param name="_packet">The packet with the info from the player.</param>
     public static void PlayerChangeWeapon(int _fromClient, Packet _packet)
     {
         int _index = _packet.ReadInt();
@@ -59,11 +67,12 @@ public class ServerHandle
         Server.clients[_fromClient].player.weaponManager.ChangeWeapon(_index);
     }
 
+    /// <summary>Processes the reload weapon input sent from a player.</summary>
+    /// <param name="_fromClient">The client sender's id.</param>
+    /// <param name="_packet">The packet with the info from the player.</param>
     public static void PlayerReload(int _fromClient, Packet _packet)
     {
-
-        Debug.Log("PlayerReload()");
-        Server.clients[_fromClient].player.weaponManager.ReloadWeapon();
+        Server.clients[_fromClient].player.weaponManager.ReloadWeapon(_fromClient);
     }
 
 }
